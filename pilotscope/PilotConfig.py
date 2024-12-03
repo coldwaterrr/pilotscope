@@ -10,22 +10,22 @@ pilot_logger = logging.getLogger("PilotScope")
 
 class PilotConfig:
     """
-    The PilotConfig class is used for storing and managing configuration information for PilotScope,
-    including the host address of PilotScope, the name of the database to connect to,
-    the username and password to log into the database, etc.
+    PilotConfig 类用于存储和管理 PilotScope 的配置信息，
+    包括 PilotScope 的主机地址、要连接的数据库名称、
+    登录数据库的用户名和密码等。
     """
 
     def __init__(self, db_type: DatabaseEnum, db="stats_tiny", pilotscope_core_host="localhost",
                  user_data_db_name="PilotScopeUserData", sql_execution_timeout=300, once_request_timeout=300) -> None:
         """
-        Initialize the PilotConfig.
+        初始化 PilotConfig。
 
-        :param db_type: the type of database, i.e. PostgreSQL, SparkSQL, etc.
-        :param db: the name of connected database
-        :param pilotscope_core_host: the host address of PilotScope in ML side.
-        :param user_data_db_name: the created database name for saving the user data. If users want to visit these data, they can set db=user_data_db_name.
-        :param sql_execution_timeout: the timeout of sql execution, unit: second
-        :param once_request_timeout: the timeout of once request, unit: second
+        :param db_type: 数据库类型，例如 PostgreSQL、SparkSQL 等。
+        :param db: 连接的数据库名称
+        :param pilotscope_core_host: PilotScope 在机器学习端的主机地址。
+        :param user_data_db_name: 用于保存用户数据的创建数据库名称。如果用户想访问这些数据，可以设置 db=user_data_db_name。
+        :param sql_execution_timeout: SQL 执行超时时间，单位：秒
+        :param once_request_timeout: 单次请求超时时间，单位：秒
         """
 
         self.db_type: DatabaseEnum = db_type
@@ -58,11 +58,11 @@ class PostgreSQLConfig(PilotConfig):
     def __init__(self, pilotscope_core_host = None, db_host = None, db_port = None, db_user= None,
                  db_user_pwd = None, db = None, sql_execution_timeout = None,once_request_timeout = None) -> None:
         """
-        :param pilotscope_core_host: the host address of PilotScope in ML side.
-        :param db_host: the host address of database
-        :param db_port: the port of database
-        :param db_user: the username to log into the database
-        :param db_user_pwd: the password to log into the database
+        :param pilotscope_core_host: PilotScope 在机器学习端的主机地址。
+        :param db_host: 数据库的主机地址
+        :param db_port: 数据库的端口
+        :param db_user: 登录数据库的用户名
+        :param db_user_pwd: 登录数据库的密码
         """
         super().__init__(db_type=DatabaseEnum.POSTGRESQL, db = db, pilotscope_core_host = pilotscope_core_host,\
                          sql_execution_timeout = sql_execution_timeout, once_request_timeout = once_request_timeout)
@@ -87,15 +87,15 @@ class PostgreSQLConfig(PilotConfig):
 
     def enable_deep_control_local(self, pg_bin_path: str = None, pg_data_path: str = None):
         """
-        Enable deep control for PostgreSQL, such as  starting and stopping database, changing config file, etc.
-        If you do not need these functions, it is not necessary to set these values.
-        If the database and PilotScope Core are on the same machine, you can use this function, i.e., pilotscope_core_host != db_host.
-        Otherwise, use `enable_deep_control_remote`
+        启用 PostgreSQL 的深度控制，例如启动和停止数据库、更改配置文件等。
+        如果不需要这些功能，则无需设置这些值。
+        如果数据库和 PilotScope Core 在同一台机器上，可以使用此功能，即 pilotscope_core_host != db_host。
+        否则，请使用 `enable_deep_control_remote`
         
-        :param pg_bin_path: the directory of binary file of postgresql, e.g., /postgres_install_path/bin
-        :param pg_data_path: location of the database data storage
-        :param db_host_user: the username to log into the database host
-        :param db_host_pwd: the password to log into the database host
+        :param pg_bin_path: postgresql 二进制文件的目录，例如 /postgres_install_path/bin
+        :param pg_data_path: 数据库数据存储的位置
+        :param db_host_user: 登录数据库主机的用户名
+        :param db_host_pwd: 登录数据库主机的密码
         """
         if pg_bin_path is None or pg_data_path is None:
             with open(os.path.join(os.path.dirname(__file__), "pilotscope_conf.json"), "r") as f:
@@ -117,16 +117,16 @@ class PostgreSQLConfig(PilotConfig):
 
     def enable_deep_control_remote(self, pg_bin_path = None, pg_data_path = None, db_host_user = None, db_host_pwd = None, db_host_ssh_port = None):
         """
-        Enable deep control for PostgreSQL, such as starting and stopping database, changing config file, etc.
-        If you do not need these functions, it is not necessary to set these values.
-        If the database and PilotScope Core are not on the same machine, you can use this function, i.e., pilotscope_core_host != db_host.
-        Otherwise, use `enable_deep_control_local`
+        启用 PostgreSQL 的深度控制，例如启动和停止数据库、更改配置文件等。
+        如果不需要这些功能，则无需设置这些值。
+        如果数据库和 PilotScope Core 不在同一台机器上，可以使用此功能，即 pilotscope_core_host != db_host。
+        否则，请使用 `enable_deep_control_local`
 
-        :param pg_bin_path:  the directory of binary file of postgresql, e.g., /postgres_install_path/bin
-        :param pg_data_path: location of the database data storage
-        :param db_host_user: the username to log into the database host
-        :param db_host_pwd: the password to log into the database host
-        :param db_host_ssh_port: the port of ssh service on the database host
+        :param pg_bin_path: postgresql 二进制文件的目录，例如 /postgres_install_path/bin
+        :param pg_data_path: 数据库数据存储的位置
+        :param db_host_user: 登录数据库主机的用户名
+        :param db_host_pwd: 登录数据库主机的密码
+        :param db_host_ssh_port: 数据库主机上 ssh 服务的端口
         """
         if pg_bin_path is None or pg_data_path is None or db_host_user is None or db_host_pwd is None or db_host_ssh_port is None:
             with open(os.path.join(os.path.dirname(__file__), "pilotscope_conf.json"), "r") as f:

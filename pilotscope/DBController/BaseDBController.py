@@ -1,8 +1,7 @@
 import threading
 from abc import ABC, abstractmethod
-
 from sqlalchemy import create_engine, String, Integer, Float, MetaData, Table, inspect, select, func, Column
-from sqlalchemy_utils import database_exists, create_database
+from sqlalchemy_utils  import database_exists, create_database
 
 from pilotscope.Common.Index import Index
 from pilotscope.Exception.Exception import DatabaseDeepControlException
