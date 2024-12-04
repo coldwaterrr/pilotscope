@@ -81,11 +81,11 @@ class CardPushHandler(BasePushHandler):
 
     def acquire_injected_data(self, sql):
         """
-        The users should implement the function to return their data from cardinality estimation algorithms.
-        The pilotscope will set these data into database automatically when execute the current SQL query.
+        用户应实现该函数以从基数估计算法中返回数据。
+        Pilotscope将在执行当前SQL查询时自动将这些数据设置到数据库中。
 
-        :param sql: current SQL query
-        :return: A dict where the key is the subquery and the value is the cardinality estimation of the subquery.
+        :param sql: 当前SQL查询
+        :return: 一个字典，其中键是子查询，值是子查询的基数估计。
         """
         pass
 
@@ -122,11 +122,11 @@ class HintPushHandler(BasePushHandler):
 
     def acquire_injected_data(self, sql):
         """
-        The users should implement the function to return their data from hint selection algorithms.
-        The pilotscope will set these data into database automatically when execute the current SQL query.
+        用户应实现该函数以从提示选择算法中返回数据。
+        Pilotscope将在执行当前SQL查询时自动将这些数据设置到数据库中。
 
-        :param sql: current SQL query
-        :return: A dict where the key is the hint name and the value is the value of the hint.
+        :param sql: 当前SQL查询
+        :return: 一个字典，其中键是提示名称，值是提示的值。
         """
         pass
 
@@ -158,11 +158,11 @@ class CommentPushHandler(BasePushHandler):
 
     def acquire_injected_data(self, sql):
         """
-        The users should implement the function to return their data from ML algorithms.
-        The pilotscope will set these data into database automatically when execute the current SQL query.
+        用户应实现该函数以从ML算法中返回数据。
+        Pilotscope将在执行当前SQL查询时自动将这些数据设置到数据库中。
 
-        :param sql: current SQL query
-        :return: A comment string that will be added before the SQL query. This can be used to add `pg_hint_plan` comments, and apply join order alrogithms.
+        :param sql: 当前SQL查询
+        :return: 一个注释字符串，将在SQL查询之前添加。 这可以用于添加`pg_hint_plan`注释，并应用连接顺序算法。
         """
         pass
 
@@ -187,11 +187,11 @@ class ScanJoinMethodPushHandler(BasePushHandler):
 
     def acquire_injected_data(self, sql):
         """
-        The users should implement the function to return their data from ML algorithms.
-        The pilotscope will set these data into database automatically when execute the current SQL query.
+        用户应实现该函数以从ML算法中返回数据。
+        Pilotscope将在执行当前SQL查询时自动将这些数据设置到数据库中。
 
-        :param sql: current SQL query
-        :return: A tuple or a list of tuple of ScanJoinMethodEnum and its parameter.
+        :param sql: 当前SQL查询
+        :return: 一个元组或元组列表，其中包含ScanJoinMethodEnum及其参数。
         """
         pass
 

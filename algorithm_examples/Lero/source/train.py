@@ -4,8 +4,8 @@ import math
 from pandas import DataFrame
 
 from pilotscope.DataManager.DataManager import DataManager
-from feature import *
-from model import LeroModel, LeroModelPairWise
+from algorithm_examples.Lero.source.feature import *
+from algorithm_examples.Lero.source.model import LeroModel, LeroModelPairWise
 
 
 def _load_pointwise_plans(path):

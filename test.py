@@ -26,30 +26,20 @@ db_config.enable_deep_control_local(pg_bin_path, pg_data_path)
 
 # You can also instantiate a PilotConfig for other DBMSes. e.g. 
 # config:PilotConfig = SparkConfig()
-db_config.db = "stats_tiny"
+db_config.db = "imdb_tiny"
 # Configure PilotScope here, e.g. changing the name of database you want to connect to.
 
 # sql = "select count(*) from votes as v, badges as b, users as u where u.id = v.userid and v.userid = b.userid and u.downvotes>=0 and u.downvotes<=0"
-sql = '''
-select count(*) from votes as v, badges as b, users as u where u.id = v.userid and v.userid = b.userid and u.downvotes>=0 and u.downvotes<=0
-'''
+# sql = '''
+# select count(*) from votes as v, badges as b, users as u where u.id = v.userid and v.userid = b.userid and u.downvotes>=0 and u.downvotes<=0
+# '''
+sql = "select count(*) from movie_companies"
 data_interactor = PilotDataInteractor(db_config)
-data_interactor.pull_estimated_cost()
-data_interactor.pull_subquery_card()
-data_interactor.pull_execution_time()
-data_interactor.pull_physical_plan()
+# data_interactor.pull_estimated_cost()
+# data_interactor.pull_subquery_card()
+# data_interactor.pull_execution_time()
+# data_interactor.pull_physical_plan()
+data_interactor.pull_record()
 data = data_interactor.execute(sql)
 print(data)
 
-# # Example of PilotDataInteractor (registering operators again and execution)
-# data_interactor.push_card({k: v * 100 for k, v in data.subquery_2_card.items()})
-# data_interactor.pull_estimated_cost()
-# data_interactor.pull_execution_time()
-# data_interactor.pull_physical_plan()
-# new_data = data_interactor.execute(sql)
-# print(new_data)
-# Get the testing sqls in PostgreSQL format
-
-# ds = StatsTinyDataset(DatabaseEnum.PostgreSQL)
-# stats_test_sql_pg = ds.read_test_sql()
-# stats_training_sql_pg = ds.read_train_sql()

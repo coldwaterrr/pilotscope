@@ -99,11 +99,11 @@ class PilotDataInteractor:
 
     def push_pg_hint_comment(self, pg_hint_comment: str):
         """
-        Set the comment of `pg_hint_plan` into input SQL query. The function is only valid for PostgreSQL.
-        The `pg_hint_plan` is an extension for the PostgreSQL database that allows users to influence the query planner's choice of execution plans.
-        You can find more information in https://github.com/ossc-db/pg_hint_plan.
+        将 `pg_hint_plan` 的注释设置到输入的 SQL 查询中。此功能仅对 PostgreSQL 有效。
+        `pg_hint_plan` 是 PostgreSQL 数据库的一个扩展，允许用户影响查询规划器的执行计划选择。
+        更多信息请参见 https://github.com/ossc-db/pg_hint_plan。
 
-        :param pg_hint_comment: a pg_hint_comment like ``/*+ HashJoin(a b) SeqScan(a) */``, which indicate the join method of `a` and `b` is HashJoin and the scan method of `a` is SeqScan.
+        :param pg_hint_comment: 一个类似于 ``/*+ HashJoin(a b) SeqScan(a) */`` 的 pg_hint_comment，表示 `a` 和 `b` 的连接方法是 HashJoin，`a` 的扫描方法是 SeqScan。
         """
 
         if self.config.db_type != DatabaseEnum.POSTGRESQL:
@@ -281,11 +281,11 @@ class PilotDataInteractor:
 
     def execute(self, sql, is_reset=True) -> Optional[PilotTransData]:
         """
-        Execute this SQL and finish all registered push-and-pull operators before.
+        执行此 SQL 并完成所有已注册的推送和拉取操作。
 
-        :param sql: a sql statement to be executed
-        :param is_reset: If it is true, all `push`/`pull` will be removed after execution
-        :return: If no exceptions, it returns a `PilotTransData` representing extended result; otherwise, it returns None.
+        :param sql: 要执行的 SQL 语句
+        :param is_reset: 如果为 true，则在执行后将删除所有 `push`/`pull` 操作
+        :return: 如果没有异常，则返回表示扩展结果的 `PilotTransData`；否则，返回 None。
         """
         try:
             self._check_anchor_mutual_exclusion()

@@ -15,7 +15,7 @@ from algorithm_examples.ExampleConfig import get_time_statistic_img_path
 
 class LeroTest(unittest.TestCase):
     def setUp(self):
-        self.config: PilotConfig = PostgreSQLConfig()
+        self.config: PilotConfig = PostgreSQLConfig(db_host="127.0.0.1",db_port="5432",db_user="zbw",db_user_pwd="pilotscope")
         self.config.db = "stats_tiny"
         self.algo = "lero"
 

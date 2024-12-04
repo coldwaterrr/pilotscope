@@ -1,8 +1,7 @@
 import configparser
 import math
 import os
-
-from feature import JOIN_TYPES, SCAN_TYPES
+from algorithm_examples.Lero.source.feature import SCAN_TYPES ,JOIN_TYPES
 
 
 def read_config():

@@ -1,0 +1,8 @@
+badges : b
+posts : p
+users : u
+comments : c
+posthistory : ph
+votes : v
+postlinks : pl
+tags : t
