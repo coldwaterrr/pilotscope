@@ -64,12 +64,15 @@ def get_selectivity(file_path, output_file_path=None):
         # print(words)
         table_name.add(words[0])
 
+    # print(table_name)
+
     data_interactor = PilotDataInteractor(db_config)
     data_interactor.pull_record()
 
 
     # print(table_name,end='\n')
     # print(len(table_name))
+
     # 获取每个表的总行数
     for table in table_name:
         # print(table,end = "\n")
@@ -77,13 +80,35 @@ def get_selectivity(file_path, output_file_path=None):
         sql = "select count(*) from %s" % (table)
         data_interactor.pull_record()
         data = data_interactor.execute(sql)
-        table_rowcount[table] = data.records['count'][0]
+        table_rowcount[table.strip()] = data.records['count'][0]  # 每个表的具体行数
         # print(data.records['count'][0])
+    
+    # print(table_rowcount)
+    # sql='''
+    # select n_distinct from pg_stats where tablename = '%s' and attname = '%s'
+    # ''' % ("info_type", "info")
+    # data_interactor.pull_record()
+    # data = data_interactor.execute(sql)
+    # print(data)
 
     # 获取每条语句涉及到的列
     attr = set()
     querypath = "pilotscope/Dataset/Imdb/job_train_ascii.txt"
+    shorttolongpath = "algorithm_examples/AlphaJoin/source/shorttolong_imdb_tiny.txt"
+
+    with open(shorttolongpath, 'r') as file:
+        lines = file.readlines()
+
+    shorttolong = dict()
     
+    for line in lines:
+        words = line.strip().split(':')
+        short = words[0].strip()
+        long = words[1].strip()
+        shorttolong[short] = long
+    
+    # print(shorttolong)
+
     with open(querypath, 'r') as file:
         lines = file.readlines()
     
@@ -93,121 +118,116 @@ def get_selectivity(file_path, output_file_path=None):
         while i < len(words):
             if '.' in words[i]:
                 # print(words[i])
+                word = words[i].split('.')
+                if word[0].split('(')[0] == 'MIN':
+                    shorttable = word[0].split('(')[1]
+                    column = word[1].strip(')')
+                    if shorttable in shorttolong:
+                        attr.add(shorttable+'.'+column)
+                else:
+                    shorttable = word[0]
+                    column = word[1]
+                    if shorttable in shorttolong:
+                        attr.add(shorttable+'.'+column.strip(';'))
+
                 
-    
-    
 
-
- 
-
-
-# Get all the attributes used to select the filter vector
-# 获取用于选择滤波器向量的所有属性
-def getQueryAttributions():
-    # fileList = os.listdir(querydir)
-    # fileList.sort()
-    attr = set()  # 创建一个无序不重复的元素集
-
-    rowscount = dict()
-
-    for queryName in fileList:
-        print(queryName)
-        querypath = querydir + "/" + queryName
-        file_object = open(querypath)
-        file_context = file_object.readlines()  # 获取query语句
-        file_object.close()
-
-        # find WHERE
-        k = -1
-        for i in range(len(file_context)):
-            k = k + 1
-            if file_context[i].find("WHERE") != -1:
-                break
-
-        # handle a sentence after WHERE
-        # 处理 WHERE 后的句子
-        for i in range(k, len(file_context)):
-            temp = file_context[i].split()  # 默认空格分隔
-            for word in temp:
-                if '.' in word:
-                    if word[0] == "'":
-                        continue
-                    if word[0] == '(':
-                        word = word[1:]  # object[start:end:step]   object[:]表示从头取到尾，步长默认为1  object[::]一样表示从头到尾，步长为1
-                    if word[-1] == ';':  # object[:5]没有Start表示从头开始取,步长为1，object[5:]表示从5开始到尾，步长为1
-                        word = word[:-1]
-
-                    if word.split('.')[0] not in key_list:
-                        continue
-
-                    short_tablename = word.split('.')[0]
-                    column = word.split('.')[1]
-
-                    print(short_tablename)
-                    long_tablename = shorttolong[short_tablename]
-
-                    if column == 'kind' or column == 'id' or column == 'role':
-                        selectivity[word] = 1.0
-
-                    # 最简单的选择率:唯一值数/行数
-                    # 获取每一张表的具体行数
-                    key_exist_1 = word in selectivity
-                    key_exist_2 = long_tablename in rowscount
-                    if key_exist_1 == False and key_exist_2 == False:
-                        sql = '''
-                        select count(*) from %s
-                        '''% (long_tablename)
-                        cur.execute(sql)
-                        rows = cur.fetchall()
-
-                        for row in rows:
-                            rowscount[long_tablename] = float(row[0])
-
-                    # 查出唯一值，计算选择率
-                        sql='''
-                        select n_distinct from pg_stats where tablename = '%s' and attname = '%s'
-                        ''' % (long_tablename, column)
-                        cur.execute(sql)
-                        rows = cur.fetchall()
-                        # print(rows)
-                        for row in rows:
-                            n_distinct = float(row[0])
-
-                        if n_distinct < 0:
-                            selectivity[word] = -n_distinct
-                        else:
-                            selectivity[word] = n_distinct / rowscount[long_tablename]
-
-
-
-                    elif key_exist_1 == False and key_exist_2 == True:
-                        # 查出唯一值，计算选择率
-                        sql = '''
-                        select n_distinct from pg_stats where tablename = '%s' and attname = '%s'
-                        ''' % (long_tablename, column)
-                        cur.execute(sql)
-                        rows = cur.fetchall()
-                        # print(rows)
-                        for row in rows:
-                            n_distinct = float(row[0])
-
-                        if n_distinct < 0:
-                            selectivity[word] = -n_distinct
-                        else:
-                            selectivity[word] = n_distinct / rowscount[long_tablename];
-
-
-                        if n_distinct < 0:
-                            selectivity[word] = -n_distinct
-                        else:
-                            selectivity[word] = n_distinct / float(rowscount[long_tablename])
-
-                    attr.add(word)
-
+                
+                # print("%s:"%(i),shorttable,end=' ')
+                # print(column,end='\n')
+            i = i+1
+    # print(attr,end='\n')
+    # print(len(attr))
     attrNames = list(attr)
     attrNames.sort()
-    return attrNames
+    # print(attrNames)
+    tableNames = list(table_name)
+    tableNames.sort()
 
+        # Mapping of table name abbreviations and numbers (list subscripts)
+    # 表名缩写和编号（列表下标）的映射
+    table_to_int = {}
+    int_to_table = {}
+    for i in range(len(tableNames)):
+        int_to_table[i] = tableNames[i]
+        table_to_int[tableNames[i]] = i
+
+    # Mapping of attributes and numbers (list subscripts)
+    # 属性和编号（列表下标）的映射
+    attr_to_int = {}
+    int_to_attr = {}
+    for i in range(len(attrNames)):
+        int_to_attr[i] = attrNames[i]
+        attr_to_int[attrNames[i]] = i
+
+    print(attr_to_int)
+
+    predicatesEncode = [0 for _ in range(len(attrNames))]
+
+    predicates =dict()
+
+    for attrName in attrNames:
+        # print(attrName)
+        longtablename = shorttolong[attrName.split('.')[0]]
+        column = attrName.split('.')[1]
+        # print(longtablename,end=' ')
+        # print(column,end = '\n')
+        
+        # 查出唯一值，计算选择率
+        sql='''
+        select n_distinct from pg_stats where tablename = '%s' and attname = '%s'
+        ''' % (longtablename, column)
+        data_interactor.pull_record()
+        data = data_interactor.execute(sql)
+
+        if (len(data.records['n_distinct']) == 0):
+            # print(column,end='\n')
+            predicatesEncode[attr_to_int[attrName]] = 1.0
+        else:
+            n_distinct = float(data.records['n_distinct'][0])
+            if n_distinct < 0:
+                predicatesEncode[attr_to_int[attrName]] = -n_distinct
+            else:
+                # print(table_rowcount[longtablename],end='\n')
+                predicatesEncode[attr_to_int[attrName]] = n_distinct / table_rowcount[longtablename]
+                
+        # print(data.records['n_distinct'],end='\n')
+        # print(predicatesEncode,end='\n')
+        # predicates[str(i)] = predicatesEncode
+    
+    with open(querypath, 'r') as file:
+        lines = file.readlines()
+    
+    predicatesEncode_fin = [0 for _ in range(len(attrNames))]
+
+    j = 0
+
+    for line in lines:
+        i = 0
+        while i < len(words):
+            if '.' in words[i]:
+                word = words[i].split('.')
+                if word[0].split('(')[0] == 'MIN':
+                    shorttable = word[0].split('(')[1]
+                    column = word[1].strip(')')
+                    if shorttable in shorttolong:
+                        attrname = shorttable + '.' + column.strip(';')
+                        predicatesEncode_fin[attr_to_int[attrname]] = predicatesEncode[attr_to_int[attrname]]
+                else:
+                    shorttable = word[0]
+                    column = word[1]
+                    if shorttable in shorttolong:
+                        attrname = shorttable + '.' + column.strip(';')
+                        predicatesEncode_fin[attr_to_int[attrname]] = predicatesEncode[attr_to_int[attrname]]
+            i = i + 1
+        j = j + 1
+        predicates[str(j)] = predicatesEncode_fin
+
+    f = open("algorithm_examples/AlphaJoin/source/predicatesEncodedDict",'w')
+    f.write(str(predicates))
+
+
+        
 
 
 
